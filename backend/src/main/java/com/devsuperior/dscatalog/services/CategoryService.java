@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,6 @@ public class CategoryService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
-	@Autowired
-	private ModelMapper mapper;
-
 	@Transactional(readOnly = true)
 	public List<CategoryDTO> findAll() {
 		var list = categoryRepository.findAll();
@@ -33,9 +29,16 @@ public class CategoryService {
 	@Transactional(readOnly = true)
 	public CategoryDTO findById(Long id) {
 		Optional<Category> obj = categoryRepository.findById(id);
-		Category entity = obj.orElseThrow(()->new EntityNotFoundException("Entity not found"));
-		return mapper.map(entity, CategoryDTO.class);
-		//return new CategoryDTO(entity);
+		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		return new CategoryDTO(entity);
+	}
+
+	@Transactional
+	public CategoryDTO insert(CategoryDTO dto) {
+		Category entity = new Category();
+		entity.setName(dto.getName());
+		entity = categoryRepository.save(entity);
+		return new CategoryDTO(entity);
 	}
 
 }
