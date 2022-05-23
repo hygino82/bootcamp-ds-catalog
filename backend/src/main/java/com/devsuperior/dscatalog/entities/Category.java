@@ -38,6 +38,11 @@ public class Category implements Serializable {
 		this.name = name;
 	}
 
+	public Category(String name) {
+		super();
+		this.name = name;
+	}
+
 	public Long getId() {
 		return id;
 	}
