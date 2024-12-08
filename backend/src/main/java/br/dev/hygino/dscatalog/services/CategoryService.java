@@ -9,6 +9,7 @@ import br.dev.hygino.dscatalog.dto.CategoryDTO;
 import br.dev.hygino.dscatalog.dto.CategoryRequestDTO;
 import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
+import br.dev.hygino.dscatalog.services.exceptions.EntityNotFoundException;
 
 @Service
 public class CategoryService {
@@ -30,5 +31,13 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public Page<CategoryDTO> findAll(Pageable pageable) {
         return repository.findAll(pageable).map(CategoryDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public CategoryDTO findById(Long id) {
+        final var entity = repository.findCategoryById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found!"));
+
+        return new CategoryDTO(entity);
     }
 }

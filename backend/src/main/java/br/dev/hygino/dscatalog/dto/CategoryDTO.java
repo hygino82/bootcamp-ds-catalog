@@ -1,15 +1,21 @@
 package br.dev.hygino.dscatalog.dto;
 
+import java.io.Serializable;
+
 import br.dev.hygino.dscatalog.entities.Category;
 
-public class CategoryDTO {
-    
+public class CategoryDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String name;
 
     public CategoryDTO(Category entity) {
         this.id = entity.getId();
         this.name = entity.getName();
+    }
+
+    public CategoryDTO() {
     }
 
     public Long getId() {
