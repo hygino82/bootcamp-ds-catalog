@@ -1,14 +1,17 @@
 package br.dev.hygino.dscatalog.services;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.dev.hygino.dscatalog.dto.CategoryDTO;
 import br.dev.hygino.dscatalog.dto.CategoryRequestDTO;
 import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
+import br.dev.hygino.dscatalog.services.exceptions.DatabaseException;
 import br.dev.hygino.dscatalog.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -50,6 +53,18 @@ public class CategoryService {
             return new CategoryDTO(repository.save(entity));
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("Id not found " + id);
+        }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha na integridade referencial!");
         }
     }
 }
