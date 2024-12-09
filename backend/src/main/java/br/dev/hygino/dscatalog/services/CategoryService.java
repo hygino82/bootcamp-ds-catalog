@@ -40,4 +40,14 @@ public class CategoryService {
 
         return new CategoryDTO(entity);
     }
+
+    @Transactional
+    public CategoryDTO update(Long id, CategoryRequestDTO dto) {
+        var entity = repository.getReferenceById(id);
+
+        entity.setName(dto.name());
+
+        return new CategoryDTO(repository.save(entity));
+
+    }
 }
