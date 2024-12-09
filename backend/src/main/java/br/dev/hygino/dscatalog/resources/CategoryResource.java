@@ -51,7 +51,7 @@ public class CategoryResource {
         return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(service.update(id, dto));
     }

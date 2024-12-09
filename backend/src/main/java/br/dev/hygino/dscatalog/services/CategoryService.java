@@ -9,7 +9,8 @@ import br.dev.hygino.dscatalog.dto.CategoryDTO;
 import br.dev.hygino.dscatalog.dto.CategoryRequestDTO;
 import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
-import br.dev.hygino.dscatalog.services.exceptions.EntityNotFoundException;
+import br.dev.hygino.dscatalog.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class CategoryService {
@@ -35,19 +36,20 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
-        final var entity = repository.findCategoryById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found!"));
+        final Category entity = repository.findCategoryById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entity not found!"));
 
         return new CategoryDTO(entity);
     }
 
     @Transactional
     public CategoryDTO update(Long id, CategoryRequestDTO dto) {
-        var entity = repository.getReferenceById(id);
-
-        entity.setName(dto.name());
-
-        return new CategoryDTO(repository.save(entity));
-
+        try {
+            Category entity = repository.getReferenceById(id);
+            entity.setName(dto.name());
+            return new CategoryDTO(repository.save(entity));
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
+        }
     }
 }
