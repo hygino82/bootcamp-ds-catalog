@@ -2,6 +2,7 @@ package br.dev.hygino.dscatalog.services;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -66,5 +67,10 @@ public class CategoryService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Falha na integridade referencial!");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
+        return repository.findAll(pageRequest).map(CategoryDTO::new);
     }
 }
