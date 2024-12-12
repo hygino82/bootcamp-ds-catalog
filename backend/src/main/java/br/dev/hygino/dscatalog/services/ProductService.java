@@ -29,7 +29,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductDTO> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable).map(ProductDTO::new);
+        return productRepository.findAll(pageable).map(x -> new ProductDTO(x, false));
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +37,7 @@ public class ProductService {
         final Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Entity not found!"));
 
-        return new ProductDTO(entity);
+        return new ProductDTO(entity, true);
     }
 
     @Transactional
@@ -54,7 +54,7 @@ public class ProductService {
         Product entity = new Product();
         setAttributesFromRequest(dto, entity, categories);
         entity = productRepository.save(entity);
-        return new ProductDTO(entity);
+        return new ProductDTO(entity, true);
     }
 
     private void setAttributesFromRequest(ProductRequestDTO dto, Product entity, Set<Category> categories) {
