@@ -2,6 +2,8 @@ package br.dev.hygino.dscatalog.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,10 +26,12 @@ public class Category implements Serializable {
     private String name;
 
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant createAt;
+    private Instant createdAt;
 
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant updateAt;
+    private Instant updatedAt;
+
+    private Set<Product> products = new HashSet<>();
 
     public Category() {
     }
@@ -53,22 +57,26 @@ public class Category implements Serializable {
         this.name = name;
     }
 
-    public Instant getCreateAt() {
-        return createAt;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public Instant getUpdateAt() {
-        return updateAt;
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
     }
 
     @PrePersist
     public void prePersist() {
-        createAt = Instant.now();
+        createdAt = Instant.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        updateAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @Override

@@ -25,27 +25,33 @@ public class Product implements Serializable {
     private Long id;
 
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private String imgUrl;
     private Double price;
 
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Instant data;
+    private Instant date;
 
     @ManyToMany
-    @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @JoinTable(
+        name = "tb_product_category", 
+        joinColumns = @JoinColumn(name = "product_id"), 
+        inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
 
     public Product() {
     }
 
-    public Product(Long id, String name, String description, String imgUrl, Double price, Instant data) {
+    public Product(Long id, String name, String description, String imgUrl, Double price, Instant date) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.imgUrl = imgUrl;
         this.price = price;
-        this.data = data;
+        this.date = date;
     }
 
     public Long getId() {
@@ -92,8 +98,8 @@ public class Product implements Serializable {
         return categories;
     }
 
-    public Instant getData() {
-        return data;
+    public Instant getDate() {
+        return date;
     }
 
     @Override
