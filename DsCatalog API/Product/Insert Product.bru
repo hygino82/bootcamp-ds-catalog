@@ -1,0 +1,22 @@
+meta {
+  name: Insert Product
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "PS5",
+    "description": "The new generation PS5 video game",
+    "price": 600.0,
+    "imgUrl": "https://m.media-amazon.com/images/I/51dfg52K-cL._AC_SX679_.jpg",
+    "date": "2020-07-20T10:00:00Z",
+    "categories": [1, 3]
+  }
+}

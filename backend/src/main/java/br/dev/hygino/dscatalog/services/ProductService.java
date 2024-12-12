@@ -1,11 +1,14 @@
 package br.dev.hygino.dscatalog.services;
 
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.dev.hygino.dscatalog.dto.ProductDTO;
+import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
 import br.dev.hygino.dscatalog.entities.Product;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
 import br.dev.hygino.dscatalog.repositories.ProductRepository;
@@ -33,5 +36,11 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Entity not found!"));
 
         return new ProductDTO(entity);
+    }
+
+    @Transactional
+    public ProductDTO insert(ProductRequestDTO dto) {
+        final var categories = dto.categories().stream().map(categoryRepository::getReferenceById)
+                .collect(Collectors.toSet());
     }
 }

@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.hygino.dscatalog.dto.ProductDTO;
+import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
 import br.dev.hygino.dscatalog.services.ProductService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/products")
@@ -30,5 +33,11 @@ public class ProductResource {
     @GetMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductDTO> insert(@RequestBody ProductRequestDTO dto) {
+        final ProductDTO res = service.insert(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 }
