@@ -42,14 +42,21 @@ public class ProductService {
 
     @Transactional
     public ProductDTO insert(ProductRequestDTO dto) {
-        final var categories = dto.categories().stream().map(categoryRepository::getReferenceById)
+        if (dto.categories() == null || dto.categories().isEmpty()) {
+            throw new IllegalArgumentException("As categorias não podem estar vazias");
+        }
+
+        final var categories = categoryRepository
+                .findAllById(dto.categories()).stream()
                 .collect(Collectors.toSet());
+
         Product entity = new Product();
-        transferAtributesToEntity(dto, entity, categories);
-        return new ProductDTO(productRepository.save(entity));
+        setAttributesFromRequest(dto, entity, categories);
+        entity = productRepository.save(entity);
+        return new ProductDTO(entity);
     }
 
-    private void transferAtributesToEntity(ProductRequestDTO dto, Product entity, Set<Category> categories) {
+    private void setAttributesFromRequest(ProductRequestDTO dto, Product entity, Set<Category> categories) {
         entity.setDescription(dto.description());
         entity.setName(dto.name());
         entity.setPrice(dto.price());
