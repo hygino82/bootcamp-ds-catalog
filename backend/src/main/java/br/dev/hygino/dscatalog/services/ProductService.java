@@ -42,13 +42,14 @@ public class ProductService {
 
     @Transactional
     public ProductDTO insert(ProductRequestDTO dto) {
-        if (dto.categories() == null || dto.categories().isEmpty()) {
-            throw new IllegalArgumentException("As categorias não podem estar vazias");
-        }
 
-        final var categories = categoryRepository
+        final Set<Category> categories = categoryRepository
                 .findAllById(dto.categories()).stream()
                 .collect(Collectors.toSet());
+
+        if (categories == null || categories.isEmpty()) {
+            throw new ResourceNotFoundException("A lista não tem nenhuma Categoria válida");
+        }
 
         Product entity = new Product();
         setAttributesFromRequest(dto, entity, categories);

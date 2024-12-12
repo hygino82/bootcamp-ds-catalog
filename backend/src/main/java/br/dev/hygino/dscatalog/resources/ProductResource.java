@@ -6,14 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.hygino.dscatalog.dto.ProductDTO;
 import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
 import br.dev.hygino.dscatalog.services.ProductService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
@@ -36,7 +37,7 @@ public class ProductResource {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> insert(@RequestBody ProductRequestDTO dto) {
+    public ResponseEntity<ProductDTO> insert(@RequestBody @Valid ProductRequestDTO dto) {
         final ProductDTO res = service.insert(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
