@@ -1,5 +1,6 @@
 package br.dev.hygino.dscatalog.services;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.dev.hygino.dscatalog.dto.ProductDTO;
 import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
+import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.entities.Product;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
 import br.dev.hygino.dscatalog.repositories.ProductRepository;
@@ -42,5 +44,17 @@ public class ProductService {
     public ProductDTO insert(ProductRequestDTO dto) {
         final var categories = dto.categories().stream().map(categoryRepository::getReferenceById)
                 .collect(Collectors.toSet());
+        Product entity = new Product();
+        transferAtributesToEntity(dto, entity, categories);
+        return new ProductDTO(productRepository.save(entity));
+    }
+
+    private void transferAtributesToEntity(ProductRequestDTO dto, Product entity, Set<Category> categories) {
+        entity.setDescription(dto.description());
+        entity.setName(dto.name());
+        entity.setPrice(dto.price());
+        entity.getCategories().addAll(categories);
+        entity.setImgUrl(dto.imgUrl());
+        entity.setDate(dto.date());
     }
 }
