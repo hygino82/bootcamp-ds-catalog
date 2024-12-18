@@ -5,7 +5,13 @@ meta {
 }
 
 get {
-  url: {{host}}/products
+  url: {{host}}/products?page=2&size=5&sort=name,desc
   body: none
   auth: none
+}
+
+params:query {
+  page: 2
+  size: 5
+  sort: name,desc
 }

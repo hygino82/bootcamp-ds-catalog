@@ -5,7 +5,12 @@ meta {
 }
 
 get {
-  url: {{host}}/categories
+  url: {{host}}/categories?page=0&size=6
   body: none
   auth: none
+}
+
+params:query {
+  page: 0
+  size: 6
 }
