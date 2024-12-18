@@ -14,14 +14,14 @@ import br.dev.hygino.dscatalog.tests.Factory;
 public class ProductRepositoryTests {
 
 	private long existingId;
+	private long nonExistingId;
 	private long countTotalProducts;
 
 	@BeforeEach
 	public void setUp() throws Exception {
 		existingId = 1L;
 		countTotalProducts = 25L;
-		// nonExistingId = 1000L;
-		// dependentId = 3L;
+		nonExistingId = 1000L;
 	}
 
 	@Autowired
@@ -45,5 +45,19 @@ public class ProductRepositoryTests {
 
 		assertNotNull(product.getId());
 		assertEquals(countTotalProducts + 1, product.getId());
+	}
+
+	@Test
+	public void findByIdShouldReturnNotEmptyWhenIdExists() {
+		final var product = repository.findById(existingId);
+
+		assertTrue(!product.isEmpty());
+	}
+
+	@Test
+	public void findByIdShouldReturnEmptyWhenIdDoesNotExists() {
+		final var product = repository.findById(nonExistingId);
+
+		assertTrue(product.isEmpty());
 	}
 }
