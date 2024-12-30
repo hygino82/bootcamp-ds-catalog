@@ -4,7 +4,6 @@ import br.dev.hygino.dscatalog.dto.ProductDTO;
 import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
 import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.entities.Product;
-import org.springframework.data.domain.PageImpl;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -18,9 +17,11 @@ public class Factory {
 
     public static Product createProduct() {
         Product product = new Product(
-                1L, "Phone",
+                1L,
+                "Phone",
                 "Good Phone",
-                "https://img.com/img.png", 800.0,
+                "https://img.com/img.png",
+                800.0,
                 Instant.parse("2024-12-18T07:12:00Z"));
         product.getCategories().add(new Category(2L, "Eletrônicos"));
 

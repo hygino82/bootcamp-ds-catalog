@@ -1,6 +1,8 @@
 package br.dev.hygino.dscatalog.services;
 
+import br.dev.hygino.dscatalog.dto.CategoryDTO;
 import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
+import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.entities.Product;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
 import br.dev.hygino.dscatalog.repositories.ProductRepository;
@@ -24,6 +26,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.time.Instant;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,5 +107,29 @@ public class ProductServiceTests {
         assertEquals("Radio", result.getContent().get(2).name());
 
         Mockito.verify(productRepository, Mockito.times(1)).findAll(pageable);
+    }
+
+    @Test
+    @DisplayName("FindById deve retornar um ProductDTO quando o id existir")
+    public void findByIdShouldReturnProductDTOWhenIdExists() {
+        final var result = service.findById(existingId);
+        final var category = new CategoryDTO(2L, "Eletrônicos");
+
+        assertNotNull(result);
+        assertEquals(1L, result.id());
+        assertEquals("Phone", result.name());
+        assertEquals("Good Phone", result.description());
+        assertEquals(800.0, result.price());
+        assertEquals(Instant.parse("2024-12-18T07:12:00Z"), result.date());
+        assertEquals("https://img.com/img.png", result.imgUrl());
+
+        assertTrue(result.categories().stream().anyMatch(c -> category.getId().equals(c.getId())));
+        assertTrue(result.categories().stream().anyMatch(c -> category.getName().equals(c.getName())));
+    }
+
+    @Test
+    @DisplayName("FindById deve lançar ResourceNotFoundException quando o id não existir")
+    public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(nonExistingId));
     }
 }
