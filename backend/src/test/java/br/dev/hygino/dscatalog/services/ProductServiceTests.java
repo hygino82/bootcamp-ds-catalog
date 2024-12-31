@@ -2,13 +2,13 @@ package br.dev.hygino.dscatalog.services;
 
 import br.dev.hygino.dscatalog.dto.CategoryDTO;
 import br.dev.hygino.dscatalog.dto.ProductRequestDTO;
-import br.dev.hygino.dscatalog.entities.Category;
 import br.dev.hygino.dscatalog.entities.Product;
 import br.dev.hygino.dscatalog.repositories.CategoryRepository;
 import br.dev.hygino.dscatalog.repositories.ProductRepository;
 import br.dev.hygino.dscatalog.services.exceptions.DatabaseException;
 import br.dev.hygino.dscatalog.services.exceptions.ResourceNotFoundException;
 import br.dev.hygino.dscatalog.tests.Factory;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,11 +23,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.time.Instant;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,8 +37,8 @@ public class ProductServiceTests {
     private long nonExistingId;
     private long dependentId;
     private Pageable pageable;
-    private Product product;
-    private ProductRequestDTO requestDTO;
+    private ProductRequestDTO productRequestDTO;
+    private CategoryDTO categoryDTO;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -48,8 +47,9 @@ public class ProductServiceTests {
         nonExistingId = 1000L;
         pageable = PageRequest.of(0, 10);
         final PageImpl<Product> page = new PageImpl<>(Factory.createProductList());
-        product = Factory.createProduct();
-        requestDTO = Factory.createProductRequest();
+        final Product product = Factory.createProduct();
+        productRequestDTO = Factory.createProductRequest();
+        categoryDTO = new CategoryDTO(2L, "Eletrônicos");
 
         Mockito.doNothing().when(productRepository).deleteById(existingId);
         Mockito.doThrow(DataIntegrityViolationException.class).when(productRepository).deleteById(dependentId);
@@ -66,6 +66,9 @@ public class ProductServiceTests {
 
         Mockito.when(productRepository.findById(existingId)).thenReturn(Optional.of(product));
         Mockito.when(productRepository.findById(nonExistingId)).thenReturn(Optional.empty());
+
+        Mockito.when(productRepository.getReferenceById(existingId)).thenReturn(product);
+        Mockito.when(productRepository.getReferenceById(nonExistingId)).thenThrow(EntityNotFoundException.class);
     }
 
     @InjectMocks
@@ -113,7 +116,6 @@ public class ProductServiceTests {
     @DisplayName("FindById deve retornar um ProductDTO quando o id existir")
     public void findByIdShouldReturnProductDTOWhenIdExists() {
         final var result = service.findById(existingId);
-        final var category = new CategoryDTO(2L, "Eletrônicos");
 
         assertNotNull(result);
         assertEquals(1L, result.id());
@@ -123,13 +125,35 @@ public class ProductServiceTests {
         assertEquals(Instant.parse("2024-12-18T07:12:00Z"), result.date());
         assertEquals("https://img.com/img.png", result.imgUrl());
 
-        assertTrue(result.categories().stream().anyMatch(c -> category.getId().equals(c.getId())));
-        assertTrue(result.categories().stream().anyMatch(c -> category.getName().equals(c.getName())));
+        assertTrue(result.categories().stream().anyMatch(c -> categoryDTO.getId().equals(c.getId())));
+        assertTrue(result.categories().stream().anyMatch(c -> categoryDTO.getName().equals(c.getName())));
     }
 
     @Test
     @DisplayName("FindById deve lançar ResourceNotFoundException quando o id não existir")
     public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
         assertThrows(ResourceNotFoundException.class, () -> service.findById(nonExistingId));
+    }
+
+    @Test
+    @DisplayName("Update deve lançar ResourceNotFoundException quando o id não existir")
+    public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+        assertThrows(ResourceNotFoundException.class, () -> service.update(nonExistingId, productRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Update deve retornar um ProductDTO quando o id existir")
+    public void updateShouldReturnProductDTOWhenIdExists() {
+        final var result = service.update(existingId, productRequestDTO);
+        assertNotNull(result);
+        assertEquals(1L, result.id());
+        assertEquals("Phone", result.name());
+        assertEquals("Good Phone", result.description());
+        assertEquals(800.0, result.price());
+        assertEquals(Instant.parse("2024-12-18T07:12:00Z"), result.date());
+        assertEquals("https://img.com/img.png", result.imgUrl());
+
+        assertTrue(result.categories().stream().anyMatch(c -> categoryDTO.getId().equals(c.getId())));
+        assertTrue(result.categories().stream().anyMatch(c -> categoryDTO.getName().equals(c.getName())));
     }
 }
