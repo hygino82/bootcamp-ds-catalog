@@ -182,6 +182,11 @@ public class ProductResourceTests {
                 delete("/products/{id}", nonExistingId));
         result.andExpect(status().isNotFound());
         Mockito.verify(service, times(1)).delete(nonExistingId);
+
+        result.andExpect(jsonPath("$.timestamp").exists());
+        result.andExpect(jsonPath("$.status").exists());
+        result.andExpect(jsonPath("$.error").exists());
+        result.andExpect(jsonPath("$.path").exists());
     }
 
     @Test
@@ -191,5 +196,10 @@ public class ProductResourceTests {
                 delete("/products/{id}", dependentId));
         result.andExpect(status().isBadRequest());
         Mockito.verify(service, times(1)).delete(dependentId);
+
+        result.andExpect(jsonPath("$.timestamp").exists());
+        result.andExpect(jsonPath("$.status").exists());
+        result.andExpect(jsonPath("$.error").exists());
+        result.andExpect(jsonPath("$.path").exists());
     }
 }
