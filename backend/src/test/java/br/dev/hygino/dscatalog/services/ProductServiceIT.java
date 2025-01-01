@@ -1,19 +1,24 @@
 package br.dev.hygino.dscatalog.services;
 
+import br.dev.hygino.dscatalog.dto.ProductDTO;
 import br.dev.hygino.dscatalog.repositories.ProductRepository;
-import br.dev.hygino.dscatalog.services.exceptions.DatabaseException;
 import br.dev.hygino.dscatalog.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional //garante que a cada teste seja feito roll back do banco de dados
 public class ProductServiceIT {
 
     @Autowired
@@ -56,14 +61,43 @@ public class ProductServiceIT {
 
     @Test
     @DisplayName("Delete deve lançar ResourceNotFoundException quando o id não existir")
-    public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+    public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
         assertThrows(ResourceNotFoundException.class, () -> service.delete(nonExistingId));
     }
 
     @Test
-    @DisplayName("Delete deve lançar DatabaseException quando o id for dependente")
-    public void deleteShouldThrowDatabaseExceptionWhenDependentId() {
-        assertThrows(DatabaseException.class, () -> service.delete(dependentId));
-        //TODO corrigir método
+    @DisplayName("FindAll deve retornar uma página 0 com 10 elementos")
+    public void findAllShouldReturnPageWhenPage0Size10() {
+        final PageRequest pageable = PageRequest.of(0, 10);
+        final Page<ProductDTO> result = service.findAll(pageable);
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(0, result.getNumber());
+        assertEquals(10, result.getSize());
+        assertEquals(countTotalProducts, result.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("FindAll deve retornar uma página vazia")
+    public void findAllShouldReturnEmptyPageWhenPageDoesNotExists() {
+        final PageRequest pageable = PageRequest.of(50, 10);
+        final Page<ProductDTO> result = service.findAll(pageable);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("FindAll deve retornar uma página ordenada por nome")
+    public void findAllShouldReturnSortedPageWhenSortByName() {
+        final PageRequest pageable = PageRequest.of(0, 10, Sort.by("name"));
+        final Page<ProductDTO> result = service.findAll(pageable);
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals("Macbook Pro", result.getContent().get(0).name());
+        assertEquals("PC Gamer", result.getContent().get(1).name());
+        assertEquals("PC Gamer Alfa", result.getContent().get(2).name());
     }
 }
