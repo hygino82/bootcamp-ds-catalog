@@ -123,4 +123,20 @@ public class ProductResourceIT {
         result.andExpect(jsonPath("$.error").exists());
         result.andExpect(jsonPath("$.path").exists());
     }
+
+    @Test
+    @DisplayName("FindById deve retornar um produto com resposta OK")
+    public void findByIdShouldReturnProductWhenIdExists() throws Exception {
+        final ResultActions result = mockMvc.perform(
+                get("/products/{id}", existingId)
+                        .accept(MediaType.APPLICATION_JSON));
+        final var date = Instant.parse("2020-07-13T20:50:07.12345Z");
+
+        result.andExpect(status().isOk());
+
+        result.andExpect(jsonPath("$.id").value(existingId));
+        result.andExpect(jsonPath("$.name").value("The Lord of the Rings"));
+        result.andExpect(jsonPath("$.description").exists());
+        result.andExpect(jsonPath("$.price").value(90.5));
+    }
 }
