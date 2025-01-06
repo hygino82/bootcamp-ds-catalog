@@ -64,7 +64,8 @@ public class Factory {
     public static ProductRequestDTO createProductRequest() {
         return new ProductRequestDTO(
                 "Phone",
-                "Good Phone", 800.0,
+                "Good Phone",
+                800.0,
                 "https://img.com/img.png",
                 Instant.parse("2024-12-18T07:12:00Z")
                 , Set.of(2L));
